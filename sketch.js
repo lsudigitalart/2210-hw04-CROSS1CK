@@ -7,21 +7,49 @@ let blockSpeed;
 
 let placedBlocks = [];
 
+const statePlaying = "playing";
+const stateLose = "lose";
+const stateWin = "win";
+
+let menuState = statePlaying;
+
 function setup(){
   createCanvas (600, 600);
+  textAlign(CENTER, CENTER);
 textSize(30)
   newGame();
 }
 
 function draw(){
   background(20);
+
+  if(menuState === statePlaying){
+    textSize(30);
   updateBlock();
   drawBlocks();
+  } else if(menuState === stateLose){
+  textSize(40);
+  fill("red");
+  text("Game Over! You suck :(", width/2, height/2);
+  textSize(35);
+  text("Press space to try again!", width/2, height *3/4);
+  } else if(menuState === stateWin) {
+    textSize(40);
+    fill("green");
+    text("Congrats! You did it!", width/2, height/2);
+    textSize(35);
+  text("Press space to try again!", width/2, height *3/4);
+  }
 }
 
 function keyReleased(){
  if(key === " ") {
-  placeBlock();
+  if(menuState === statePlaying) {
+    placeBlock();
+  } else {
+    newGame();
+    menuState = statePlaying;
+  }
  }
 }
 
@@ -48,7 +76,7 @@ function updateBlock(){
 function drawBlocks(){
   fill("pink");
   rect(currentBlock.x, currentBlock.y, currentBlock.z, blockHeight);
-  fill (50);
+  fill ("purple");
   for (let block of placedBlocks){
     rect(block.x, block.y, block.z, blockHeight);
   }
@@ -70,9 +98,9 @@ function placeBlock(){
        currentBlock.x = leftEdge;
        currentBlock.z = newWidth;
     }
-  
+    
     if (newWidth < 0){
-      newGame();
+      menuState = stateLose;
       return;
     }
   placedBlocks.push(currentBlock);
@@ -84,6 +112,11 @@ function placeBlock(){
 
 function newBlock(newWidth){
   const blockStackHeight = (placedBlocks.length + 1) * blockHeight;
+
+  if(blockStackHeight > height){
+    menuState = stateWin;
+    return;
+  }
 
   currentBlock = createVector(0, height - blockStackHeight, newWidth);
 }
